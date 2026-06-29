@@ -1,0 +1,49 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "PixelShooter",
+            "request": "launch",
+            "mainClass": "PixelShooter",
+            "projectName": "PixelShooter-V3_3cb91acf"
+        },
+        {
+            "type": "java",
+            "name": "PixelShooter",
+            "request": "launch",
+            "mainClass": "PixelShooter",
+            "projectName": "PixelShooter-V3_baa4b104"
+        },
+        {
+            "type": "java",
+            "name": "Dinospiel",
+            "request": "launch",
+            "mainClass": "Dinospiel",
+            "projectName": "PixelShooter-V2_baa4b103"
+        },
+        {
+            "type": "java",
+            "name": "PixelShooter",
+            "request": "launch",
+            "mainClass": "PixelShooter",
+            "projectName": "PixelShooter-V2_baa4b103"
+        },
+        {
+            "type": "java",
+            "name": "PixelShooter",
+            "request": "launch",
+            "mainClass": "PixelShooter",
+            "projectName": "PixelShooter2D_8fac790f"
+        },
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        }
+    ]
+}
