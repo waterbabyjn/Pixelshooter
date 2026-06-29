@@ -42,6 +42,7 @@ public class PixelShooter extends SPIEL {
 
     private char mode = '1';
     private int score = 0;
+    private int tripleShotsLeft = 0;
 
     // Player
     private Spieler player;
@@ -80,6 +81,7 @@ public class PixelShooter extends SPIEL {
 
     // TEXT
     private TEXT GO;
+    private TEXT TryAgain;
     private TEXT Leben;
     private TEXT ScoreLabel;
 
@@ -215,7 +217,7 @@ public class PixelShooter extends SPIEL {
                 // long start = System.nanoTime();
 
                 if (player.beruehrt(power1) && powerTimer[0] == 0) {
-                    mode = '3';
+                    tripleShotsLeft = 3;
                     loading[0].setzeSichtbar(true);
                     powerTimer[0] = cooldown;
                 }
@@ -293,11 +295,20 @@ public class PixelShooter extends SPIEL {
                 // System.out.println((System.nanoTime() - start) / 1_000_000.0 + " ms");
 
                 if (player.getHearts() == 0) {
-                    GO = new TEXT(player.nenneMx(), player.nenneMy(), 3, "GameOver");
-                    GO.setzeSchriftart("test.ttf");
-                    GO.setzeFarbe("rot");
-                    GO.setzeSichtbar(true);
-                    GO.setzeEbenenposition(3);
+                    if (GO == null) {
+                        GO = new TEXT(player.nenneMx(), player.nenneMy(), 3, "GameOver");
+                        GO.setzeSchriftart("test.ttf");
+                        GO.setzeFarbe("rot");
+                        GO.setzeSichtbar(true);
+                        GO.setzeEbenenposition(3);
+                    }
+                    if (TryAgain == null) {
+                        TryAgain = new TEXT(player.nenneMx(), player.nenneMy() - 1.2, 2, "Try Again");
+                        TryAgain.setzeSchriftart("test.ttf");
+                        TryAgain.setzeFarbe("rot");
+                        TryAgain.setzeSichtbar(true);
+                        TryAgain.setzeEbenenposition(3);
+                    }
                     gameOver = true;
                 }
 
@@ -323,23 +334,27 @@ public class PixelShooter extends SPIEL {
 
     @Override
     public void klickReagieren(double x, double y) {
+        if (gameOver && TryAgain != null && TryAgain.beinhaltetPunkt(x, y)) {
+            new PixelShooter();
+            return;
+        }
+
         double off = 0.25;
         double px = player.nenneMx();
         double py = player.nenneMy();
         if (this.Projektile != null) {
             if (shootTimer == 0) {
                 if (ProjektileCount + 2 < Projektile.length) {
-                    if (mode == '3') {
+                    if (tripleShotsLeft > 0) {
                         for (int i = 0; i < 3; i++) {
                             Projektile[ProjektileCount + i] = new Projektil(
                                     px + ((i - 1) * off) * -Math.sin(Math.toRadians(calcDIR(px, py, x, y))),
-                                    py + ((i - 1) * off) * Math.cos(Math.toRadians(calcDIR(px, py, x, y))), mode,
+                                    py + ((i - 1) * off) * Math.cos(Math.toRadians(calcDIR(px, py, x, y))), '3',
                                     calcDIR(px, py, x, y));
                         }
 
-                        /// BOMB
-
                         ProjektileCount += 3;
+                        tripleShotsLeft--;
                     } else {
                         Projektile[ProjektileCount] = new Projektil(px, py, mode, calcDIR(px, py, x, y));
                         ProjektileCount++;

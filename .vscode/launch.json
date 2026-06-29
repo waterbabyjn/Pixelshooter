@@ -9,6 +9,13 @@
             "name": "PixelShooter",
             "request": "launch",
             "mainClass": "PixelShooter",
+            "projectName": "Pixelshooter_948bb8ac"
+        },
+        {
+            "type": "java",
+            "name": "PixelShooter",
+            "request": "launch",
+            "mainClass": "PixelShooter",
             "projectName": "PixelShooter-V3_3cb91acf"
         },
         {

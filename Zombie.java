@@ -1,10 +1,12 @@
 public class Zombie extends FIGUR {
     private double speed;
-    private double ozx = 0;
-    private double ozy = 0;
+    private static final double SIGHT_RANGE = 4.0;
+    private static final double MOVE_TOLERANCE = 0.001;
 
-    private boolean[] dir = {true, true, true, true};
-                            /* U     D     L     R */
+    private double wanderX = 0.05;
+    private double wanderY = 0.0;
+    private int stuckFrames = 0;
+    private int pauseFrames = 0;
 
     public Zombie(double x, double y) {
         super("shoot/zombie.png");
@@ -23,47 +25,74 @@ public class Zombie extends FIGUR {
 
         double zx = nenneMx();
         double zy = nenneMy();
-        double angle = Math.toDegrees(Math.atan2(py - zy, px - zx));
-        // this.setzeDrehwinkel(angle);
+        double dxToPlayer = px - zx;
+        double dyToPlayer = py - zy;
+        double distanceSquared = dxToPlayer * dxToPlayer + dyToPlayer * dyToPlayer;
+        double sightRangeSquared = SIGHT_RANGE * SIGHT_RANGE;
 
-        double dx = speed * Math.cos(Math.toRadians(angle));
-        double dy = speed * Math.sin(Math.toRadians(angle));
+        double moveX = 0;
+        double moveY = 0;
 
-        double mdx = dx;
-        double mdy = dy;
-
-        if (dir[3] == false && dir[2] == false) {
-            mdx = 0;
-        } else if ((dx > 0 && dir[3] == false) || (dx < 0 && dir[2] == false)) { mdx  = dx * -1;};
-        if (dir[1] == false && dir[0] == false) {
-            mdy = 0;
-        } else if ((dy > 0 && dir[0] == false) || (dy < 0 && dir[1] == false)) { mdy  = dy * -1;};
-
-        verschiebenUm(mdx, mdy);
-
-        if (zx != ozx && zy != ozy) {
-            ozx = zx;
-            ozy = zy;
-        } else {
-            if (zx == ozx) {
-                if (dx > 0) { dir[3] = false;}; // rmove R
-                if (dx < 0) { dir[2] = false;}; // rmove L
-            } else if (zx != ozx) {
-                dir[3] = true; 
-                dir[2] = true;
-            }
-            if (zy == ozy) {
-                if (dy > 0) { dir[0] = false;}; // rmove U
-                if (dy < 0) { dir[1] = false;}; // rmove D
-            } else if (zy != ozy) {
-                dir[1] = true; 
-                dir[0] = true;
-            }
+        if (pauseFrames > 0) {
+            pauseFrames--;
+            verschiebenUm(0, 0);
+            return;
         }
 
+        if (distanceSquared <= sightRangeSquared) {
+            double followSpeed = speed * 0.6;
+
+            if (dxToPlayer > 0.05) {
+                moveX = followSpeed;
+            } else if (dxToPlayer < -0.05) {
+                moveX = -followSpeed;
+            }
+
+            if (dyToPlayer > 0.05) {
+                moveY = followSpeed;
+            } else if (dyToPlayer < -0.05) {
+                moveY = -followSpeed;
+            }
+        } else {
+            moveX = wanderX * speed;
+            moveY = wanderY * speed;
+        }
+
+        double oldX = zx;
+        double oldY = zy;
+        verschiebenUm(moveX, moveY);
+
+        if (stuck(oldX, nenneMx()) && stuck(oldY, nenneMy())) {
+            stuckFrames++;
+        } else {
+            stuckFrames = 0;
+        }
+
+        if (stuckFrames >= 6) {
+            stuckFrames = 0;
+            pauseFrames = 2;
+            berechneNeueWanderRichtung();
+        }
+    }
+
+    private void berechneNeueWanderRichtung() {
+        if (wanderX != 0) {
+            wanderY = wanderX;
+            wanderX = 0;
+        } else if (wanderY != 0) {
+            wanderX = -wanderY;
+            wanderY = 0;
+        } else {
+            wanderX = speed;
+            wanderY = 0;
+        }
     }
 
     public boolean stuck(double a, double b) {
-        return Math.abs(a - b) < 0.1;
+        double diff = a - b;
+        if (diff < 0) {
+            diff = -diff;
+        }
+        return diff < MOVE_TOLERANCE;
     }
 }
